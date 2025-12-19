@@ -43,7 +43,6 @@ def main(page: ft.Page):
                              color=TEXT, bgcolor=BACKGROUND, border_color="#3B4252")
 
         def upd_data(e):
-
             date_text.value = str(date.value)
             page.update()
         date = ft.DatePicker(on_change=upd_data)
@@ -52,15 +51,55 @@ def main(page: ft.Page):
         def show():
             date.open = True
             page.update()
+
+        def password_update(_= None):
+            if password1.value != password2.value:
+                dialog = ft.AlertDialog(modal=True, title=ft.Text(
+                    "Пароли не совпадают!", size=DEFAULT_TEXT_SIZE, bgcolor=BACKGROUND, color=TEXT))
+                dialog.open = True
+                return False
+            page.update()
+            return True 
+
+        def register():
+            nme = name.value
+            lname = last_name.value
+            em = email.value
+            passw = password1.value
+            date_ = date.value
+            
+            if password_update() and nme and lname and em and passw and date_:
+                user = account.Person(nme, lname, date_, em, passw)
+                user.register()
+            else:
+                print("failed to register")
+
+
+
+        def login():
+            nme = name.value
+            lname = last_name.value
+            em = email.value
+            passw = password1.value
+            date_ = date.value
+            
+            if nme and lname and em and passw and date_:
+                user = account.Person(nme, lname, date_, em, passw)
+                login = user.login()
+                if not login:
+                    print(f"user {em} is not in database")
+                else:
+                    print(f"user {em}")
         date_utils = ft.Row(
             [
                 date_text,
-                ft.Button("Выбрать дату", color="#2E3440",
-                          bgcolor="#D8DEE9", on_click=lambda _: show())
+                ft.Button("Выбрать дату", color="#2E3440", bgcolor="#D8DEE9", on_click=lambda _: show())
             ]
         )
-        password1 = ft.TextField(password=True, can_reveal_password=True)
-        password2 = ft.TextField(password=True, can_reveal_password=True)
+        password1 = ft.TextField(password=True, can_reveal_password=True,
+                                 on_change=password_update, color=TEXT, bgcolor=BACKGROUND, border_color="#3B4252")
+        password2 = ft.TextField(password=True, can_reveal_password=True,
+                                 on_change=password_update, color=TEXT, bgcolor=BACKGROUND, border_color="#3B4252")
 
         container = ft.Container(ft.Column([
             ft.Text("Имя", size=DEFAULT_TEXT_SIZE,
@@ -76,10 +115,20 @@ def main(page: ft.Page):
                     bgcolor=BACKGROUND, color=TEXT),
             date,
             date_utils,
-            ft.Text("введите пароль", size=DEFAULT_TEXT_SIZE,
+            ft.Text("Введите пароль", size=DEFAULT_TEXT_SIZE,
                     bgcolor=BACKGROUND, color=TEXT),
-            password1
+            password1,
+
+            ft.Text("Повторите пароль", size=DEFAULT_TEXT_SIZE,
+                    bgcolor=BACKGROUND, color=TEXT),
+            password2,
+            ft.Row([
+                ft.Button("Вход", color="#2E3440", bgcolor="#D8DEE9", on_click=lambda _: login()),
+                ft.Button("Зарегестрироваться", color="#2E3440", bgcolor="#D8DEE9", on_click=lambda _: register()),
+            ])
+
         ],)
+
 
         )
         page.views.append(
@@ -90,8 +139,6 @@ def main(page: ft.Page):
                         [
                             ft.Button("Домашняя страница", color="#2E3440",
                                       bgcolor="#D8DEE9", on_click=lambda _: page.go("/")),
-                            ft.Button("Зарегестрироваться", color="#2E3440",
-                                      bgcolor="#D8DEE9", on_click=lambda _: page.go("/register")),
                         ],
                         alignment=ft.MainAxisAlignment.START
                     ),
@@ -120,6 +167,7 @@ def main(page: ft.Page):
 
     main_page()
     page.on_route_change = route_change
+    page.update()
 
 
 ft.app(target=main)
