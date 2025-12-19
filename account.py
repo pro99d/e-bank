@@ -2,20 +2,36 @@ import uuid
 import random
 import hashlib
 import datetime
+import shifr
 
 
 class Person:
-    def __init__(self, name: str, last_name: str, age: datetime.date) -> None:
+    def __init__(self, name: str, last_name: str, born_date: datetime.date, email: str,password: str) -> None:
         self.name: str = name
         self.last_name: str = last_name
-        self.age: datetime.date = age
-        self.uuid = uuid.uuid4()
+        self.born_date: datetime.date = born_date
+        self.email: str = email
+        self.password: str = password
+    def register(self,password2: str):
+        with open('base.txt') as email_list:
+            emails = email_list.readlines()
+            if self.password == password2 and self.email not in emails:
+                with open('users.txt','a',encoding='utf-8') as user_list:
+                    user_list.write(shifr.codification(self.name)+','+shifr.codification(self.last_name)+','+str(self.born_date)+','+shifr.codification(self.email)+','+shifr.codification(self.password))
+    def login(self):
+        login = False
+        with open('users.txt') as user_list:
+            users = user_list.readlines()
+            for i in users:
+                if i == shifr.codification(self.name)+','+shifr.codification(self.last_name)+','+str(self.born_date)+','+shifr.codification(self.email)+','+shifr.codification(self.password):
+                    login = True
+                    break
+
 
 class Account:
     def __init__(self, owner: Person) -> None:
         self.money: float = 0
         self.user: Person = owner
-        self._generate_uuid()
 
     def deposite(self, amount: float):
         self.money += amount
@@ -26,13 +42,9 @@ class Account:
         else:
             raise ValueError(f"balance is lower then {amount}")
 
-    def _generate_uuid(self) -> None:
-        self._uuid = uuid.uuid4()
 
-
-
-def main():
-    user = Person(random.randbytes(4).decode(), random.randbytes(4).decode(), datetime.date(random.randint(0, 2025), random.randint(1, 12), random.randint(1, 31)))
-
-if __name__ == "__main__":
-    main()
+#def main():
+#    user = Person("oleg", "spitsyn", datetime.date(2010, 3, 31))
+#
+#if __name__ == "__main__":
+#    main()
