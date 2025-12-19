@@ -32,7 +32,7 @@ class Account:
 
 
 def main():
-    user = Person("oleg", "spitsyn", datetime.date(2010, 3, 31))
+    user = Person(random.randbytes(4).decode(), random.randbytes(4).decode(), datetime.date(random.randint(0, 2025), random.randint(1, 12), random.randint(1, 31)))
 
 if __name__ == "__main__":
     main()

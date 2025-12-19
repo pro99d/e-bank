@@ -3,6 +3,7 @@ import account
 import datetime
 
 TEXT = "#2E3440"
+COLOR = "3B4252"
 BACKGROUND = "#D8DEE9"
 
 DEFAULT_TEXT_SIZE = 20
@@ -13,9 +14,10 @@ def main(page: ft.Page):
     page.bgcolor = BACKGROUND
     balance = account.Account(account.Person("Noname", "Какой-та", datetime.date(2025, 12, 16)))
     text = ft.Text("Спасибо, за использование Е-банка!", size= DEFAULT_BIG_TEXT_SIZE, bgcolor= BACKGROUND, color= TEXT)
-    login_button = ft.ElevatedButton()
+    login_button = ft.Row([text, ft.Button(text= "Войти", color=COLOR, bgcolor= BACKGROUND)], alignment= ft.MainAxisAlignment.SPACE_BETWEEN)
+    
     balance = ft.Text(f"баланc: {str(balance.money)}", size=DEFAULT_TEXT_SIZE, bgcolor= BACKGROUND, color= TEXT)
-    page.add(text, balance)
+    page.add(login_button, balance)
     page.update()
 
 
