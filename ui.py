@@ -29,13 +29,15 @@ def main(page: ft.Page):
         )
         page.update()
     def login_page():
+        name = ft.TextField("Name"),
+        last_name = ft.TextField("last name"),
         page.views.append(
             ft.View(
                 "/login",
                 [
                     ft.Button("Home", color= COLOR, bgcolor= BACKGROUND, on_click= lambda _: page.go("/")),
-                    ft.TextField("Name"),
-                    ft.TextField("Name"),
+                    name,
+                    last_name,
                 ],
                 bgcolor= BACKGROUND
             )
