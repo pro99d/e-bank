@@ -7,30 +7,57 @@ import account
 TEXT = "#2E3440"
 COLOR = "3B4252"
 BACKGROUND = "#ECEff4"
+LOGINED = False
 
 DEFAULT_TEXT_SIZE = 20
 DEFAULT_BIG_TEXT_SIZE = 50
 
+last_route = "/"
 
 def main(page: ft.Page):
     page.title = "Е-Банк"
     page.bgcolor = BACKGROUND
-
+    home_button = ft.Button("Домашняя страница", color="#2E3440", bgcolor="#D8DEE9", on_click=lambda _: page.go("/"))
     def main_page():
         text = ft.Text("Спасибо, за использование Е-банка!",
                        size=DEFAULT_BIG_TEXT_SIZE, bgcolor=BACKGROUND, color=TEXT)
-        login_button = ft.Row([text, ft.Button(text="Войти", color="#2E3440", bgcolor="#D8DEE9",
-                              on_click=lambda _: page.go("/login"))], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
-        balance_t = ft.Text(f"баланc: 0", size=DEFAULT_TEXT_SIZE,
-                            bgcolor=BACKGROUND, color=TEXT)
+        login_button = ft.Button(text="Войти", color="#2E3440", bgcolor="#D8DEE9", on_click=lambda _: page.go("/login"))
+
+        balance_button = ft.Button(text="Баланс", color="#2E3440", bgcolor="#D8DEE9", on_click=lambda _: page.go("/balance"))
+
         page.views.append(
             ft.View(
                 "/",
                 [
-                    login_button,
-                    balance_t,
+                    ft.Row(
+                        [
+                            text,
+                            ft.Row(
+                                [
+                                    balance_button,
+                                    login_button
+                                ],
+                                alignment= ft.MainAxisAlignment.END
+                            )
+                        ],
+                        alignment= ft.MainAxisAlignment.SPACE_BETWEEN
+                    )
                 ],
                 bgcolor=BACKGROUND
+            )
+        )
+
+    def balance_page():
+        if not LOGINED:
+            page.go("/login")
+        print(LOGINED)
+        page.views.append(
+            ft.View(
+                "/balance",
+                [
+                    home_button,
+
+                ]
             )
         )
 
@@ -54,9 +81,9 @@ def main(page: ft.Page):
 
         def password_update(_= None):
             if password1.value != password2.value:
-                dialog = ft.AlertDialog(modal=True, title=ft.Text(
+                dialog = ft.AlertDialog(modal=False, title=ft.Text(
                     "Пароли не совпадают!", size=DEFAULT_TEXT_SIZE, bgcolor=BACKGROUND, color=TEXT))
-                dialog.open = True
+                page.open(dialog)
                 return False
             page.update()
             return True 
@@ -71,6 +98,8 @@ def main(page: ft.Page):
             if password_update() and nme and lname and em and passw and date_:
                 user = account.Person(nme, lname, date_, em, passw)
                 user.register()
+                user.login()
+                print(f"user {nme} registered")
             else:
                 print("failed to register")
 
@@ -88,8 +117,11 @@ def main(page: ft.Page):
                 login = user.login()
                 if not login:
                     print(f"user {em} is not in database")
+                    LOGINED = False
                 else:
-                    print(f"user {em}")
+                    print(f"user {nme}")
+                    LOGINED = True
+                    page.go(last_route)
         date_utils = ft.Row(
             [
                 date_text,
@@ -97,9 +129,9 @@ def main(page: ft.Page):
             ]
         )
         password1 = ft.TextField(password=True, can_reveal_password=True,
-                                 on_change=password_update, color=TEXT, bgcolor=BACKGROUND, border_color="#3B4252")
+                                 color=TEXT, bgcolor=BACKGROUND, border_color="#3B4252")
         password2 = ft.TextField(password=True, can_reveal_password=True,
-                                 on_change=password_update, color=TEXT, bgcolor=BACKGROUND, border_color="#3B4252")
+                                 color=TEXT, bgcolor=BACKGROUND, border_color="#3B4252")
 
         container = ft.Container(ft.Column([
             ft.Text("Имя", size=DEFAULT_TEXT_SIZE,
@@ -137,8 +169,7 @@ def main(page: ft.Page):
                 [
                     ft.Row(
                         [
-                            ft.Button("Домашняя страница", color="#2E3440",
-                                      bgcolor="#D8DEE9", on_click=lambda _: page.go("/")),
+                            home_button,
                         ],
                         alignment=ft.MainAxisAlignment.START
                     ),
@@ -155,15 +186,20 @@ def main(page: ft.Page):
             main_page()
         elif route == "/login":
             login_page()
+        elif route == "/balance":
+            balance_page()
         else:
             page.views.append(
                 ft.View(
                     "/404",
-                    [ft.Button("Домашняя страница", color="#2E3440",
-                               bgcolor="#D8DEE9", on_click=lambda _: page.go("/"))]
+                    [
+                        home_button,
+                        ft.Text("")
+                    ]
                 )
             )
         page.update()
+        last_route = route
 
     main_page()
     page.on_route_change = route_change
