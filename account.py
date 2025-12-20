@@ -20,6 +20,7 @@ class Person:
                 with open('users.txt', 'a', encoding='utf-8') as user_list:
                     user_list.write(shifr.codification(self.name)+','+shifr.codification(self.last_name)+','+str(
                         self.born_date)+','+shifr.codification(self.email)+','+shifr.codification(self.password))
+                    user_list.write("\n")
 
     def login(self):
         with open('users.txt') as user_list:
